@@ -1,21 +1,22 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
 import { GenericValidator } from '../../shared/generic-validator';
 import { NumberValidators } from '../../shared/number.validator';
-import { getcurrentProduct, State } from '../state/product.reducer';
+import { getcurrentProduct } from '../state/product.reducer';
 import { Store } from '@ngrx/store';
 import * as ProductActions from '../state/product.actions';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'pm-product-edit',
   templateUrl: './product-edit.component.html'
 })
-export class ProductEditComponent implements OnInit, OnDestroy {
+export class ProductEditComponent implements OnInit {
   pageTitle = 'Product Edit';
   errorMessage = '';
   productForm: FormGroup;
@@ -26,6 +27,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   displayMessage: { [key: string]: string } = {};
   private validationMessages: { [key: string]: { [key: string]: string } };
   private genericValidator: GenericValidator;
+  product$: Observable<Product>;
 
   constructor(private fb: FormBuilder,
               private productService: ProductService,
@@ -62,18 +64,14 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     });
 
     // Watch for changes to the currently selected product
-    // TODO: Unsubscribe
-    this.store.select(getcurrentProduct).subscribe(
-      currentProduct => this.displayProduct(currentProduct)
+    this.product$ = this.store.select(getcurrentProduct).pipe(
+      tap(p => this.displayProduct(p))
     );
 
     // Watch for value changes for validation
     this.productForm.valueChanges.subscribe(
       () => this.displayMessage = this.genericValidator.processMessages(this.productForm)
     );
-  }
-
-  ngOnDestroy(): void {
   }
 
   // Also validate on blur
@@ -83,9 +81,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   displayProduct(product: Product | null): void {
-    // Set the local product property
-    this.product = product;
-
     if (product) {
       // Reset the form back to pristine
       this.productForm.reset();
