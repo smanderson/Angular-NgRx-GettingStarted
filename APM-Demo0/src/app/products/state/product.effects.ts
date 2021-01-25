@@ -33,4 +33,12 @@ export class ProductEffects {
             catchError(error => of(ProductActions.createProductError({ error })))
         ))
     ));
+
+    deleteProduct$ = createEffect(() => this.actions$.pipe(
+        ofType(ProductActions.deleteProduct),
+        concatMap(action => this.productService.deleteProduct(action.productId).pipe(
+            map(_ => ProductActions.deleteProductSuccess()),
+            catchError(error => of(ProductActions.deleteProductError({ error })))
+        ))
+    ));
 }
