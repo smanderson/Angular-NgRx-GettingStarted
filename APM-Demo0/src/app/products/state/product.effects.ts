@@ -25,4 +25,12 @@ export class ProductEffects {
             catchError(error => of(ProductActions.updateProductError({ error })))
         ))
     ));
+
+    addProduct$ = createEffect(() => this.actions$.pipe(
+        ofType(ProductActions.createProduct),
+        concatMap(action => this.productService.createProduct(action.product).pipe(
+            map(product => ProductActions.createProductSuccess({ product })),
+            catchError(error => of(ProductActions.createProductError({ error })))
+        ))
+    ));
 }

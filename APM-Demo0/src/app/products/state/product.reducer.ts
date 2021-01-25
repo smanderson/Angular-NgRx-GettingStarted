@@ -98,5 +98,15 @@ export const productReducer = createReducer<ProductState>(
     on(ProductActions.updateProductError, (state: ProductState, action): ProductState => ({
         ...state,
         error: action.error
+    })),
+    on(ProductActions.createProductSuccess, (state: ProductState, action): ProductState => ({
+        ...state,
+        products: state.products.concat(action.product),
+        currentProductId: action.product.id,
+        error: ''
+    })),
+    on(ProductActions.createProductError, (state: ProductState, action): ProductState => ({
+        ...state,
+        error: action.error
     }))
 );
