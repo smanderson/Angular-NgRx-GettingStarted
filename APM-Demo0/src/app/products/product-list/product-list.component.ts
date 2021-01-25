@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { Product } from '../product';
 import * as ProductActions from '../state/product.actions';
-import { getcurrentProduct, getError, getproducts, getShowProductCode, State } from '../state/product.reducer';
+import { getCurrentProduct, getError, getProducts, getShowProductCode, State } from '../state/product.reducer';
 
 @Component({
   selector: 'pm-product-list',
@@ -22,9 +22,9 @@ export class ProductListComponent implements OnInit {
   constructor(private store: Store<State>) { }
 
   ngOnInit(): void {
-    this.selectedProduct$ = this.store.select(getcurrentProduct);
+    this.selectedProduct$ = this.store.select(getCurrentProduct);
 
-    this.products$ = this.store.select(getproducts);
+    this.products$ = this.store.select(getProducts);
 
     this.errorMessage$ = this.store.select(getError);
 
@@ -42,7 +42,7 @@ export class ProductListComponent implements OnInit {
   }
 
   productSelected(product: Product): void {
-    this.store.dispatch(ProductActions.setCurrentProduct({product}));
+    this.store.dispatch(ProductActions.setCurrentProduct( { currentProductId: product.id } ));
   }
 
 }
